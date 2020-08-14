@@ -1,0 +1,30 @@
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>Google Maps - gmplot</title>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&key=AIzaSyAm4vrzQVlfDxV2L13PuWgHEiwVaS8IPHc"></script>
+<script type="text/javascript">
+    function initialize() {
+        var map = new google.maps.Map(document.getElementById("map_canvas"), {
+            zoom: 11,
+            center: new google.maps.LatLng(49.214515, -122.957920)
+        });
+
+        new google.maps.GroundOverlay(
+            "chainvsindep_heatmap.png",
+            {"north": 49.38242101469448, "south": 49.00637459452641, "east": -122.18923832055239, "west": -123.34182430374567},
+            {
+                opacity: 0.8,
+                map: map,
+                clickable: false
+            }
+        );
+
+    }
+</script>
+</head>
+<body style="margin:0px; padding:0px;" onload="initialize()">
+    <div id="map_canvas" style="width: 100%; height: 100%;" />
+</body>
+</html>
