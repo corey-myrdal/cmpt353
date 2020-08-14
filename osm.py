@@ -53,25 +53,12 @@ def main(in_directory):
     osm_chains_us = osm_rest[osm_rest['name'].isin(us_chains['Name'])]
     
     # combine lists
-    #osm_chains_can = osm_chains_can.merge(osm_chains_us, on='name', how='left')
     osm_chains_can = pd.concat([osm_chains_can,osm_chains_us], sort='True')#.drop_duplicates().reset_index(drop=True)
     osm_chains_can = osm_chains_can.drop_duplicates(subset=['lat','lon']).reset_index()
     
     # combine methods
-    #osm_chains = osm_chains_can.merge(osm_chains_us, on='name', how='outer')
     osm_chains = pd.concat([osm_chains,osm_chains_can], sort='True')#.drop_duplicates().reset_index(drop=True)
     osm_chains = osm_chains.drop_duplicates(subset=['lat','lon']).reset_index()
-    
-    # gather independent restaurants
-    #osm_indep = pd.concat([osm_rest,osm_chains], sort=False)
-    #osm_indep = osm_indep.drop_duplicates(subset=['lat','lon']).reset_index()
-    #print(len(osm_indep))
-    #print(osm_indep['name'])
-    #osm_indep.to_csv('test3.csv')
-    osm_chains_can.to_csv('test4.csv')
-    osm_chains.to_csv('test5.csv')
-    
-    #osm_chains = osm_chains.merge(osm_chains_can, on='name', how='left')
     
     
     # segment osm data into grid
@@ -150,11 +137,10 @@ def main(in_directory):
     gmap.heatmap(osm_indep['lat'].values,osm_indep['lon'].values)
     gmap.draw('map_indep.html')
     
-    #### heatmap zoom in vancouver ###
-    grid_density = 120
-    x_diff = xmax-xmin
-    y_diff = ymax-ymin
-    x_grid = np.linspace(xmin, xmax, grid_density*1.3)
+    ############################################################
+    #### heatmap zoom in ###
+    grid_density = 300
+    x_grid = np.linspace(xmin, xmax, grid_density*1.5)
     y_grid = np.linspace(ymin, ymax, grid_density)
     
     dens_rest, x_edges, y_edges = np.histogram2d(osm_rest['lon'].values, osm_rest['lat'].values, bins=[x_grid, y_grid])
@@ -167,7 +153,7 @@ def main(in_directory):
 
     # density of chains over independents
     dens_chain_vs_indep = dens_chain - dens_indep
-
+    
     dens_chain_vs_indep[dens_chain_vs_indep == 0] = np.nan
     
     x_mesh, y_mesh = np.meshgrid(x_edges, y_edges)
@@ -192,7 +178,7 @@ def main(in_directory):
     
     # save heatmap
     img_bound = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-    fig.savefig('chainvsindep_heatmap.png', format='png', transparent=True, bbox_inches=img_bound, pad_inches=0)
+    fig.savefig('chainvsindep_heatmap_zoom.png', format='png', dpi=1000, transparent=True, bbox_inches=img_bound, pad_inches=0)
     
     # overlap heatmap on google map
     lat_mid = np.mean(osm_rest['lat'])
@@ -208,16 +194,15 @@ def main(in_directory):
     west = (xmin-lon_mid)*grid_size + lon_mid
     
     bounds = {'north':north, 'south':south, 'east':east, 'west':west}
-    gmap.ground_overlay('chainvsindep_heatmap.png', bounds, opacity=0.8)
+    gmap.ground_overlay('chainvsindep_heatmap_zoom.png', bounds, opacity=0.8)
 
-    gmap.draw('map_chainvsindep.html')
+    gmap.draw('map_chainvsindep_zoom.html')
     
     
     
 
 if __name__=='__main__':
     in_directory = sys.argv[1]
-    #out_directory = sys.argv[2]
     main(in_directory)
     
     
